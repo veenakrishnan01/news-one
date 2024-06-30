@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+//weather APIs baseurl and apikeys
+const baseURL = process.env.REACT_APP_WEATHER_BASE_URL;
+const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
+
 function Weather() {
   const [weather, setWeather] = useState();
   const [loading, setLoading] = useState(false);
@@ -10,15 +14,13 @@ function Weather() {
   }, []);
 
   function fetchWeatherData() {
+    //get user's current position using navigator geolocation
     navigator.geolocation.getCurrentPosition(showPosition);
   }
 
   function showPosition(position) {
     if (position) {
-      //weather APIs baseurl and apikeys
-      const baseURL = process.env.REACT_APP_WEATHER_BASE_URL;
-      const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
-      //get user's position
+      //get user's latitude and longitude
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
 
@@ -38,38 +40,27 @@ function Weather() {
         });
     }
   }
+  //Convert Farenheit to Celcius
   const temperature = (temp) => Math.round(temp - 273.15);
+
   return (
-    <div className="container mt-5">
-      <h2 className="text-center mb-4">Weather Information</h2>
+    <div>
       {loading ? (
-        <div className="text-center">
-          <div className="text-primary" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-        </div>
+        <span className="text-primary">Loading...</span>
       ) : weather ? (
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-6">
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">Location: {weather.name}</h5>
-                <p className="card-text">
-                  Temperature: {temperature(weather.main.temp) + "°C"}
-                </p>
-                <p className="card-text">
-                  Condition: {weather.weather[0].description}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <span>
+          <span className="text-primary">
+            {weather.name} {temperature(weather.main.temp) + "°C"}
+          </span>
+          <br></br>
+          <span className="text-secondary">
+            Condition: {weather.weather[0].description}
+          </span>
+        </span>
       ) : (
-        <div className="text-center">
-          <p className="text-danger">
-            Weather data not available, location permission needed
-          </p>
-        </div>
+        <span className="text-danger">
+          Weather data not available, location permission needed
+        </span>
       )}
     </div>
   );
